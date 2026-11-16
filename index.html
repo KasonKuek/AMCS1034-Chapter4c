@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python Exception Handling Lab</title>
+<meta name="description" content="Learn Python exception handling (try, except, else, finally, raise) with runnable code, quizzes and exam practice.">
+<style>
+:root{
+  --bg:#f7f6f2; --surface:#ffffff; --surface-2:#f0eee8; --text:#1f2328; --muted:#5d6470;
+  --line:#dedbd2; --accent:#2f6f5e; --accent-soft:#e1efe9; --code-bg:#1e2430; --code-text:#e6e9ef;
+  --ok:#2f7d4a; --ok-soft:#e3f2e8; --bad:#b4413a; --bad-soft:#f8e5e3;
+  --list:#3a6ea5; --tuple:#8a5a2b; --set:#6b4fa3; --dict:#2f6f5e;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15181d; --surface:#1d2128; --surface-2:#252a33; --text:#e7e9ee; --muted:#a3abb8;
+    --line:#333a45; --accent:#7cc4ad; --accent-soft:#1f3a33; --code-bg:#0f1217; --code-text:#e6e9ef;
+    --ok:#7fd39a; --ok-soft:#1d3427; --bad:#f19a92; --bad-soft:#3a2221;
+    --list:#8db8e8; --tuple:#e0b07a; --set:#b9a1ea; --dict:#7cc4ad;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15181d; --surface:#1d2128; --surface-2:#252a33; --text:#e7e9ee; --muted:#a3abb8;
+  --line:#333a45; --accent:#7cc4ad; --accent-soft:#1f3a33; --code-bg:#0f1217; --code-text:#e6e9ef;
+  --ok:#7fd39a; --ok-soft:#1d3427; --bad:#f19a92; --bad-soft:#3a2221;
+  --list:#8db8e8; --tuple:#e0b07a; --set:#b9a1ea; --dict:#7cc4ad;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+code,pre,textarea{font-family:ui-monospace,"Cascadia Code",Consolas,monospace}
+a{color:var(--accent)}
+header{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.bar{max-width:1080px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:18px;margin-right:auto}
+.brand small{display:block;font-weight:400;font-size:13px;color:var(--muted)}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:none;border:1px solid transparent;color:var(--text);padding:8px 14px;border-radius:8px;font:inherit;font-size:15px;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+main{max-width:1080px;margin:0 auto;padding:24px 16px 64px}
+section[hidden]{display:none}
+h1{font-size:28px;margin:0 0 6px}
+h2{font-size:22px;margin:32px 0 10px}
+h3{font-size:18px;margin:20px 0 8px}
+p.lead{color:var(--muted);margin:0 0 20px;max-width:760px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;border-top:4px solid var(--c)}
+.card h3{margin:0 0 4px;color:var(--c)}
+.card code{font-size:15px}
+.card ul{margin:8px 0 0;padding-left:18px}
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:15px}
+th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--surface-2);font-weight:600}
+tr:last-child td{border-bottom:none}
+td code,p code,li code{background:var(--surface-2);padding:1px 5px;border-radius:4px;font-size:14px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.steps li{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px 10px 48px;position:relative}
+.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:14px;top:10px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--surface);font-weight:700;font-size:13px;display:grid;place-items:center}
+.note{background:var(--accent-soft);border-left:4px solid var(--accent);padding:10px 14px;border-radius:6px;margin:14px 0}
+/* lab */
+.lab{display:grid;grid-template-columns:260px 1fr;gap:16px}
+@media (max-width:760px){.lab{grid-template-columns:1fr}}
+.ex-list{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px;max-height:620px;overflow:auto}
+.ex-group{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:10px 8px 4px}
+.ex-list button{display:block;width:100%;text-align:left;background:none;border:none;color:var(--text);padding:7px 10px;border-radius:7px;font:inherit;font-size:14px;cursor:pointer}
+.ex-list button:hover{background:var(--surface-2)}
+.ex-list button.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.editor{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.editor-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.editor-head strong{margin-right:auto}
+textarea#code{width:100%;min-height:300px;border:none;resize:vertical;padding:14px;background:var(--code-bg);color:var(--code-text);font-size:14px;line-height:1.55;tab-size:4;outline:none}
+pre#out{margin:0;padding:14px;min-height:120px;background:var(--surface-2);font-size:14px;white-space:pre-wrap;word-break:break-word;border-top:1px solid var(--line)}
+pre#out.err{color:var(--bad)}
+.btn{background:var(--accent);color:var(--surface);border:none;padding:8px 16px;border-radius:8px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.btn.ghost{background:none;color:var(--text);border:1px solid var(--line);font-weight:400}
+.btn:disabled{opacity:.6;cursor:wait}
+.status{font-size:13px;color:var(--muted)}
+/* quiz */
+.quiz-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.score{font-weight:700;font-size:18px}
+.progress{flex:1;min-width:160px;height:8px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.progress span{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}
+.q .qn{font-size:13px;color:var(--muted)}
+.q pre{background:var(--code-bg);color:var(--code-text);padding:10px 12px;border-radius:8px;overflow-x:auto;font-size:14px;margin:8px 0}
+.opts{display:grid;gap:6px;margin-top:8px}
+.opts button{text-align:left;background:var(--surface);border:1px solid var(--line);color:var(--text);padding:9px 12px;border-radius:8px;font:inherit;font-size:15px;cursor:pointer}
+.opts button:hover:not(:disabled){border-color:var(--accent)}
+.opts button.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:600}
+.opts button.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.opts button:disabled{cursor:default}
+.explain{margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--surface-2);font-size:15px}
+/* exam */
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.ex h3{margin:0 0 6px;font-size:17px}
+.ex details summary{cursor:pointer;font-weight:600;color:var(--accent)}
+.ex pre{background:var(--code-bg);color:var(--code-text);padding:10px 12px;border-radius:8px;overflow-x:auto;font-size:14px}
+.ans{border-top:1px dashed var(--line);margin-top:12px;padding-top:10px}
+.marks{float:right;font-size:13px;color:var(--muted);font-weight:400}
+.theme{background:none;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;font-size:14px}
+@media (max-width:640px){header{position:static}.bar{gap:10px}nav{order:3;width:100%;flex-wrap:nowrap;overflow-x:auto}nav button{white-space:nowrap;padding:7px 10px}.brand{font-size:16px}}
+pre.big{background:var(--code-bg);color:var(--code-text);padding:14px 16px;border-radius:10px;overflow-x:auto;font-size:14px;line-height:1.55}
+footer{max-width:1080px;margin:0 auto;padding:0 16px 32px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">Python Exception Handling Lab<small>Chapter 4C · try, except, else, finally, raise</small></div>
+    <nav role="tablist">
+      <button role="tab" data-tab="learn" aria-selected="true">Learn</button>
+      <button role="tab" data-tab="lab" aria-selected="false">Code Lab</button>
+      <button role="tab" data-tab="quiz" aria-selected="false">Quiz</button>
+      <button role="tab" data-tab="exam" aria-selected="false">Exam Practice</button>
+    </nav>
+    <button class="theme" id="theme">Dark mode</button>
+  </div>
+</header>
+
+<main>
+<!-- LEARN -->
+<section id="learn">
+  <h1>When things go wrong: exception handling</h1>
+  <p class="lead">An <strong>exception</strong> is an error that happens <strong>while the program is running</strong>, such as dividing by zero or typing letters where a number is expected. Without handling, the program crashes. With <code>try</code> / <code>except</code>, the program catches the problem, reacts politely and keeps going.</p>
+
+  <div class="note"><strong>Daily-life picture:</strong> you <strong>try</strong> to pay with your card. <strong>If it fails</strong> (except), you pay with cash. <strong>If it works</strong> (else), you collect your receipt. <strong>Either way</strong> (finally), you take your card back from the machine.</div>
+
+  <div class="cards">
+    <div class="card" style="--c:var(--list)"><h3>try</h3><code>try:</code>
+      <ul><li>The risky code</li><li>Stops at the first error</li><li>"Let me attempt this"</li></ul></div>
+    <div class="card" style="--c:var(--bad)"><h3>except</h3><code>except ValueError:</code>
+      <ul><li>Runs <strong>only if</strong> that error happens</li><li>Can have many</li><li>"Plan B"</li></ul></div>
+    <div class="card" style="--c:var(--ok)"><h3>else</h3><code>else:</code>
+      <ul><li>Runs <strong>only if no</strong> error</li><li>Optional</li><li>"It worked, carry on"</li></ul></div>
+    <div class="card" style="--c:var(--tuple)"><h3>finally</h3><code>finally:</code>
+      <ul><li>Runs <strong>always</strong></li><li>For clean-up (close files)</li><li>"Take your card back"</li></ul></div>
+  </div>
+
+  <h2>The full structure</h2>
+<pre class="big">try:
+    # risky code
+except ZeroDivisionError:
+    # runs if this error happens
+except (ValueError, TypeError) as e:
+    # one block for several errors; e holds the message
+except Exception:
+    # catch-all, always put it LAST
+else:
+    # runs only if try had NO error
+finally:
+    # runs every time</pre>
+
+  <h2>Which blocks run?</h2>
+  <div class="tbl"><table>
+    <tr><th>What happens in <code>try</code></th><th>Rest of try</th><th>except</th><th>else</th><th>finally</th><th>Code after</th></tr>
+    <tr><td>No error</td><td>runs</td><td>skipped</td><td><strong>runs</strong></td><td>runs</td><td>runs</td></tr>
+    <tr><td>Error, and an <code>except</code> matches</td><td><strong>skipped</strong></td><td><strong>matching one runs</strong></td><td>skipped</td><td>runs</td><td>runs</td></tr>
+    <tr><td>Error, but <strong>no</strong> except matches</td><td>skipped</td><td>skipped</td><td>skipped</td><td>runs</td><td><strong>crash</strong>, does not run</td></tr>
+  </table></div>
+
+  <h2>Common exceptions</h2>
+  <div class="tbl"><table>
+    <tr><th>Exception</th><th>Example that causes it</th><th>Meaning</th></tr>
+    <tr><td><code>ZeroDivisionError</code></td><td><code>10 / 0</code></td><td>dividing by zero</td></tr>
+    <tr><td><code>ValueError</code></td><td><code>int("abc")</code></td><td>right type, wrong value</td></tr>
+    <tr><td><code>TypeError</code></td><td><code>"5" + 3</code></td><td>wrong type for the operation</td></tr>
+    <tr><td><code>NameError</code></td><td><code>print(totl)</code></td><td>variable name doesn't exist (typo)</td></tr>
+    <tr><td><code>IndexError</code></td><td><code>[1, 2, 3][10]</code></td><td>position out of range</td></tr>
+    <tr><td><code>KeyError</code></td><td><code>d["age"]</code></td><td>dictionary key doesn't exist</td></tr>
+    <tr><td><code>FileNotFoundError</code></td><td><code>open("missing.txt")</code></td><td>file doesn't exist</td></tr>
+    <tr><td><code>AttributeError</code></td><td><code>"abc".push("d")</code></td><td>object has no such method</td></tr>
+  </table></div>
+  <div class="note"><strong>Syntax error vs exception:</strong> a <code>SyntaxError</code> (missing colon, wrong indentation) stops Python <strong>before</strong> the program starts, so <code>try</code> cannot catch it. Exceptions happen <strong>during</strong> the run and can be caught.</div>
+
+  <h2>raise: create your own error</h2>
+  <p>Sometimes Python thinks the data is fine but your program doesn't, like an age of -5. Use <code>raise</code> to signal the problem yourself:</p>
+<pre class="big">if age &lt; 0:
+    raise ValueError("age cannot be negative")</pre>
+  <p>You can also make your own exception type: <code>class InsufficientFundsError(Exception): pass</code>.</p>
+
+  <h2>How to read a traceback</h2>
+  <ol class="steps">
+    <li>Read the <strong>last line first</strong>: it names the error and gives the message, e.g. <code>ZeroDivisionError: division by zero</code>.</li>
+    <li>Look just above it for the <strong>line number</strong> where it happened.</li>
+    <li>Ask: which value was wrong at that line? Fix the cause, or wrap it in <code>try</code> if bad input is expected.</li>
+  </ol>
+
+  <h2>Traps students fall into</h2>
+  <div class="tbl"><table>
+    <tr><th>Code</th><th>What happens</th><th>Better</th></tr>
+    <tr><td><code>except:</code> (bare)</td><td>hides every error, even your own typos</td><td>name the error: <code>except ValueError:</code></td></tr>
+    <tr><td><code>except Exception</code> first</td><td>specific blocks below are never reached</td><td>specific first, <code>Exception</code> last</td></tr>
+    <tr><td><code>except ValueError, TypeError:</code></td><td>SyntaxError</td><td>use brackets: <code>except (ValueError, TypeError):</code></td></tr>
+    <tr><td>using a variable set inside <code>try</code> after an error</td><td>NameError, because it was never created</td><td>use it in <code>else</code>, or give it a default first</td></tr>
+    <tr><td>putting the whole program in one <code>try</code></td><td>hard to tell which line failed</td><td>keep <code>try</code> small: only the risky lines</td></tr>
+    <tr><td><code>raise "age is wrong"</code></td><td>TypeError: must raise an exception</td><td><code>raise ValueError("age is wrong")</code></td></tr>
+  </table></div>
+
+  <div class="note">Next: open the <strong>Code Lab</strong> to run every example yourself, then test yourself in <strong>Quiz</strong> and <strong>Exam Practice</strong>.</div>
+</section>
+
+<!-- LAB -->
+<section id="lab" hidden>
+  <h1>Code Lab</h1>
+  <p class="lead">Pick an example, press <strong>Run</strong>, then change the code and run it again. Python runs in your browser, so nothing is installed. The first run takes a few seconds to load Python.</p>
+  <div class="lab">
+    <div class="ex-list" id="exList"></div>
+    <div class="editor">
+      <div class="editor-head">
+        <strong id="exTitle">Example</strong>
+        <span class="status" id="status"></span>
+        <button class="btn ghost" id="reset">Reset</button>
+        <button class="btn" id="run">▶ Run</button>
+      </div>
+      <textarea id="code" spellcheck="false" aria-label="Python code"></textarea>
+      <pre id="out" aria-live="polite">Output appears here.</pre>
+    </div>
+  </div>
+  <p class="status">Tip: press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to run. <code>input()</code> doesn't work here; set values in the code instead.</p>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz" hidden>
+  <h1>Quiz</h1>
+  <p class="lead">Click an answer to check it. Each question explains the answer.</p>
+  <div class="quiz-top">
+    <span class="score" id="score">0 / 0</span>
+    <div class="progress"><span id="bar"></span></div>
+    <button class="btn ghost" id="restart">Restart</button>
+  </div>
+  <div id="qs"></div>
+</section>
+
+<!-- EXAM -->
+<section id="exam" hidden>
+  <h1>Exam Practice</h1>
+  <p class="lead">Structured questions in exam style. Write your answer on paper first, then open the model answer. You can paste any code into the Code Lab to check it.</p>
+  <div id="exams"></div>
+</section>
+</main>
+
+<footer>AMCS1034 Software Development Fundamentals · For learning purposes.</footer>
+
+<script>
+const EXAMPLES = [{"group": "Basics", "title": "1. A crash with no handling", "code": "print(\"Start\")\nx = 10 / 0          # ZeroDivisionError: program stops here\nprint(\"This line never runs\")\n"}, {"group": "Basics", "title": "2. Catch it with try / except", "code": "print(\"Start\")\ntry:\n    x = 10 / 0\n    print(\"Result:\", x)          # skipped\nexcept ZeroDivisionError:\n    print(\"Cannot divide by zero!\")\nprint(\"Program continues\")\n"}, {"group": "Basics", "title": "3. Lines after the error are skipped", "code": "try:\n    print(\"Step 1\")\n    num = int(\"abc\")     # error happens here\n    print(\"Step 2\")      # skipped\n    print(\"Step 3\")      # skipped\nexcept ValueError:\n    print(\"Jumped to except\")\nprint(\"After try\")\n"}, {"group": "Basics", "title": "4. See the message with 'as e'", "code": "try:\n    num = int(\"12a\")\nexcept ValueError as e:\n    print(\"Error type:\", type(e).__name__)\n    print(\"Message   :\", e)\n"}, {"group": "Common errors", "title": "5. Tour of common exceptions", "code": "tests = [\n    \"10 / 0\",\n    \"int('hello')\",\n    \"'5' + 3\",\n    \"[1, 2, 3][10]\",\n    \"{'name': 'Ali'}['age']\",\n    \"undefined_var\",\n    \"open('missing.txt')\",\n    \"'abc'.push('d')\",\n]\nfor code in tests:\n    try:\n        eval(code)\n    except Exception as e:\n        print(f\"{code:26} -> {type(e).__name__}\")\n"}, {"group": "Multiple except", "title": "6. Different errors, different messages", "code": "def divide(a, b):\n    try:\n        result = int(a) / int(b)\n        print(f\"{a} / {b} = {result}\")\n    except ValueError:\n        print(f\"'{a}' or '{b}' is not a whole number\")\n    except ZeroDivisionError:\n        print(\"You cannot divide by zero\")\n\ndivide(\"10\", \"2\")\ndivide(\"10\", \"x\")\ndivide(\"10\", \"0\")\n"}, {"group": "Multiple except", "title": "7. One except for several errors", "code": "data = [10, 20, 30]\nfor pos in [\"1\", \"5\", \"two\"]:\n    try:\n        print(\"Item:\", data[int(pos)])\n    except (IndexError, ValueError) as e:\n        print(\"Bad position\", repr(pos), \"->\", type(e).__name__)\n"}, {"group": "Multiple except", "title": "8. Order matters (specific first)", "code": "# Exception catches everything, so put it LAST\ntry:\n    x = 5 / 0\nexcept ZeroDivisionError:\n    print(\"Specific: divide by zero\")\nexcept Exception as e:\n    print(\"General:\", e)\n\n# Wrong order: the general one wins every time\ntry:\n    x = 5 / 0\nexcept Exception:\n    print(\"General caught it first, the specific block is never reached\")\nexcept ZeroDivisionError:\n    print(\"never printed\")\n"}, {"group": "else and finally", "title": "9. else runs only when no error", "code": "for text in [\"25\", \"abc\"]:\n    try:\n        age = int(text)\n    except ValueError:\n        print(text, \"-> not a number\")\n    else:\n        print(text, \"-> OK, next year you will be\", age + 1)\n"}, {"group": "else and finally", "title": "10. finally ALWAYS runs", "code": "for b in [2, 0]:\n    try:\n        print(\"10 /\", b, \"=\", 10 / b)\n    except ZeroDivisionError:\n        print(\"Error: divide by zero\")\n    finally:\n        print(\"finally: clean up (always runs)\")\n    print(\"---\")\n"}, {"group": "else and finally", "title": "11. Full flow tracer", "code": "def test(value):\n    print(f\"Input {value!r}\")\n    try:\n        print(\"  try: start\")\n        n = int(value)\n        print(\"  try: converted to\", n)\n    except ValueError:\n        print(\"  except: not a number\")\n    else:\n        print(\"  else: no error happened\")\n    finally:\n        print(\"  finally: always\")\n    print(\"  after the whole block\\n\")\n\ntest(\"7\")\ntest(\"seven\")\n"}, {"group": "else and finally", "title": "12. finally even runs after return", "code": "def check():\n    try:\n        return \"returned from try\"\n    finally:\n        print(\"finally ran before the function left\")\n\nprint(check())\n"}, {"group": "Raise", "title": "13. raise your own error", "code": "def set_age(age):\n    if age < 0 or age > 150:\n        raise ValueError(f\"age must be 0-150, got {age}\")\n    return age\n\nfor a in [20, -5, 200]:\n    try:\n        print(\"Age set:\", set_age(a))\n    except ValueError as e:\n        print(\"Rejected:\", e)\n"}, {"group": "Raise", "title": "14. Custom exception class", "code": "class InsufficientFundsError(Exception):\n    pass\n\nclass Account:\n    def __init__(self, balance):\n        self.balance = balance\n\n    def withdraw(self, amount):\n        if amount > self.balance:\n            raise InsufficientFundsError(\n                f\"balance RM{self.balance}, tried RM{amount}\")\n        self.balance -= amount\n        return self.balance\n\nacc = Account(100)\nfor amt in [30, 200, 50]:\n    try:\n        print(\"Withdrew\", amt, \"-> left RM\", acc.withdraw(amt))\n    except InsufficientFundsError as e:\n        print(\"Declined:\", e)\n"}, {"group": "Practical", "title": "15. Keep asking until valid", "code": "# input() does not work in the browser, so this list pretends to be the user typing\ntyped = iter([\"abc\", \"-3\", \"\", \"18\"])\n\nwhile True:\n    text = next(typed)\n    print(\"User typed:\", repr(text))\n    try:\n        age = int(text)\n        if age <= 0:\n            raise ValueError(\"age must be positive\")\n    except ValueError as e:\n        print(\"  Invalid:\", e)\n    else:\n        print(\"  Accepted age\", age)\n        break\n"}, {"group": "Practical", "title": "16. Skip bad data, keep good data", "code": "marks = [\"80\", \"75\", \"absent\", \"90\", \"\", \"65.5\"]\ntotal = 0\ncount = 0\nfor m in marks:\n    try:\n        total += float(m)\n        count += 1\n    except ValueError:\n        print(\"Skipped:\", repr(m))\nprint(\"Valid marks:\", count)\nprint(\"Average:\", round(total / count, 1))\n"}, {"group": "Practical", "title": "17. Files: FileNotFoundError", "code": "# write a file first\nwith open(\"marks.txt\", \"w\") as f:\n    f.write(\"Ali,80\\nMei,95\\n\")\n\nfor name in [\"marks.txt\", \"result.txt\"]:\n    try:\n        with open(name) as f:\n            print(name, \"->\", f.read().split())\n    except FileNotFoundError:\n        print(name, \"-> file not found, please check the name\")\n"}, {"group": "Practical", "title": "18. Safe dictionary lookup", "code": "prices = {\"nasi lemak\": 5.5, \"teh tarik\": 2.8}\norder = [\"teh tarik\", \"roti canai\", \"nasi lemak\"]\n\ntotal = 0\nfor item in order:\n    try:\n        total += prices[item]\n        print(f\"{item:12} RM{prices[item]:.2f}\")\n    except KeyError:\n        print(f\"{item:12} not on menu\")\nprint(f\"Total: RM{total:.2f}\")\n"}];
+
+/* ---------- tabs ---------- */
+const tabs = document.querySelectorAll('nav button');
+function showTab(name){
+  tabs.forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name));
+  document.querySelectorAll('main > section').forEach(s => s.hidden = s.id !== name);
+  try { localStorage.setItem('tab', name); } catch(e){}
+  window.scrollTo(0,0);
+}
+tabs.forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+try { const t = localStorage.getItem('tab'); if (t && document.getElementById(t)) showTab(t); } catch(e){}
+
+/* ---------- theme ---------- */
+document.getElementById('theme').addEventListener('click', () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+  setThemeLabel();
+});
+function setThemeLabel(){
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.getElementById('theme').textContent = dark ? 'Light mode' : 'Dark mode';
+}
+setThemeLabel();
+
+/* ---------- code lab ---------- */
+const list = document.getElementById('exList');
+const codeBox = document.getElementById('code');
+const outBox = document.getElementById('out');
+const statusEl = document.getElementById('status');
+let current = 0, lastGroup = null;
+EXAMPLES.forEach((ex, i) => {
+  if (ex.group !== lastGroup){
+    const g = document.createElement('div'); g.className = 'ex-group'; g.textContent = ex.group;
+    list.appendChild(g); lastGroup = ex.group;
+  }
+  const b = document.createElement('button'); b.textContent = ex.title;
+  b.addEventListener('click', () => loadEx(i)); list.appendChild(b);
+});
+function loadEx(i){
+  current = i;
+  list.querySelectorAll('button').forEach((b, j) => b.classList.toggle('active', j === i));
+  document.getElementById('exTitle').textContent = EXAMPLES[i].title;
+  codeBox.value = EXAMPLES[i].code;
+  outBox.textContent = 'Press Run to see the output.'; outBox.classList.remove('err');
+}
+loadEx(0);
+document.getElementById('reset').addEventListener('click', () => loadEx(current));
+codeBox.addEventListener('keydown', e => {
+  if (e.key === 'Tab'){ e.preventDefault();
+    const s = codeBox.selectionStart; codeBox.setRangeText('    ', s, codeBox.selectionEnd, 'end'); }
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); runCode(); }
+});
+
+let pyReady = null;
+function loadPy(){
+  if (pyReady) return pyReady;
+  statusEl.textContent = 'Loading Python…';
+  pyReady = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/pyodide@0.26.4/pyodide.js';
+    s.onload = () => loadPyodide({indexURL:'https://cdn.jsdelivr.net/npm/pyodide@0.26.4/'}).then(resolve, reject);
+    s.onerror = () => reject(new Error('Could not load Python. Check your internet connection.'));
+    document.head.appendChild(s);
+  });
+  pyReady.catch(() => { pyReady = null; });
+  return pyReady;
+}
+const runBtn = document.getElementById('run');
+async function runCode(){
+  runBtn.disabled = true; outBox.classList.remove('err'); outBox.textContent = '';
+  try {
+    const py = await loadPy();
+    statusEl.textContent = 'Running…';
+    let text = '';
+    py.setStdout({batched: s => { text += s + '\n'; }});
+    py.setStderr({batched: s => { text += s + '\n'; }});
+    const ns = py.globals.get('dict')();
+    try {
+      await py.runPythonAsync(codeBox.value, {globals: ns});
+      outBox.textContent = text || '(no output: add a print() to see something)';
+    } catch (err) {
+      const msg = String(err.message || err);
+      const lines = msg.trim().split('\n');
+      const at = lines.findIndex(l => l.includes('File "<exec>"'));
+      const short = at >= 0 ? 'Traceback (most recent call last):\n' + lines.slice(at).join('\n') : lines.slice(-1).join('\n');
+      outBox.textContent = text + short; outBox.classList.add('err');
+    } finally { ns.destroy(); }
+    statusEl.textContent = '';
+  } catch (e) {
+    outBox.textContent = e.message; outBox.classList.add('err'); statusEl.textContent = '';
+  }
+  runBtn.disabled = false;
+}
+runBtn.addEventListener('click', runCode);
+
+/* ---------- quiz ---------- */
+const QUIZ = [
+{
+"q": "When does the code in an <code>except</code> block run?",
+"o": [
+"Always",
+"Only when an error happens in try (and the type matches)",
+"Only when no error happens",
+"Before the try block"
+],
+"a": 1,
+"e": "<code>except</code> is Plan B: it runs only if the matching error happens inside <code>try</code>."
+},
+{
+"q": "What does this print?",
+"c": "try:\n    print(\"A\")\n    x = 1 / 0\n    print(\"B\")\nexcept ZeroDivisionError:\n    print(\"C\")",
+"o": [
+"A B C",
+"A C",
+"C",
+"A B"
+],
+"a": 1,
+"e": "\"A\" prints, then the error happens, so the rest of <code>try</code> (\"B\") is skipped and Python jumps to <code>except</code>."
+},
+{
+"q": "Which error does <code>int(\"3.5\")</code> raise?",
+"o": [
+"TypeError",
+"ValueError",
+"SyntaxError",
+"No error, it gives 3"
+],
+"a": 1,
+"e": "<code>int()</code> accepts a string, but \"3.5\" is not a whole-number string. Right type, wrong value → <code>ValueError</code>. (<code>int(float(\"3.5\"))</code> works.)"
+},
+{
+"q": "Which error does <code>\"Age: \" + 20</code> raise?",
+"o": [
+"ValueError",
+"NameError",
+"TypeError",
+"KeyError"
+],
+"a": 2,
+"e": "You can't join a string and an int with <code>+</code>. Wrong type → <code>TypeError</code>. Fix: <code>\"Age: \" + str(20)</code>."
+},
+{
+"q": "When does the <code>else</code> block of a try statement run?",
+"o": [
+"When an error happens",
+"Only when no error happens in try",
+"Always",
+"Only after finally"
+],
+"a": 1,
+"e": "<code>else</code> runs only when <code>try</code> finished without any error."
+},
+{
+"q": "What does this print?",
+"c": "try:\n    n = int(\"5\")\nexcept ValueError:\n    print(\"bad\")\nelse:\n    print(\"good\")\nfinally:\n    print(\"done\")",
+"o": [
+"good",
+"good done",
+"bad done",
+"done"
+],
+"a": 1,
+"e": "No error, so <code>except</code> is skipped, <code>else</code> runs, and <code>finally</code> always runs."
+},
+{
+"q": "What does this print?",
+"c": "try:\n    n = int(\"x\")\nexcept ValueError:\n    print(\"bad\")\nelse:\n    print(\"good\")\nfinally:\n    print(\"done\")",
+"o": [
+"bad",
+"bad good done",
+"bad done",
+"done"
+],
+"a": 2,
+"e": "The error sends Python to <code>except</code>; <code>else</code> is skipped; <code>finally</code> still runs."
+},
+{
+"q": "Which block is the best place to close a file so it is closed whether or not an error happened?",
+"o": [
+"try",
+"except",
+"else",
+"finally"
+],
+"a": 3,
+"e": "<code>finally</code> runs every time, so it's the place for clean-up. (A <code>with open(...)</code> block also closes the file for you.)"
+},
+{
+"q": "What is wrong with this order?",
+"c": "try:\n    x = 10 / 0\nexcept Exception:\n    print(\"general\")\nexcept ZeroDivisionError:\n    print(\"zero\")",
+"o": [
+"Nothing, it prints zero",
+"It prints general; the specific block is never reached",
+"SyntaxError",
+"It prints both"
+],
+"a": 1,
+"e": "Python checks <code>except</code> blocks from top to bottom. <code>Exception</code> matches everything, so put specific errors first."
+},
+{
+"q": "Which line correctly catches two error types in one block?",
+"o": [
+"except ValueError, TypeError:",
+"except ValueError or TypeError:",
+"except (ValueError, TypeError):",
+"except [ValueError, TypeError]:"
+],
+"a": 2,
+"e": "Group them in a tuple: <code>except (ValueError, TypeError):</code>. The comma-only version is a SyntaxError in Python 3, and <code>or</code> catches only ValueError."
+},
+{
+"q": "What does this print?",
+"c": "try:\n    x = int(\"12a\")\nexcept ValueError as e:\n    print(type(e).__name__)",
+"o": [
+"e",
+"ValueError",
+"12a",
+"Exception"
+],
+"a": 1,
+"e": "<code>as e</code> stores the error object. <code>type(e).__name__</code> gives its class name; <code>print(e)</code> would give the message."
+},
+{
+"q": "Can <code>try / except</code> catch a missing colon, like <code>if x &gt; 5</code>?",
+"o": [
+"Yes, as SyntaxError",
+"No, syntax errors stop the program before it runs",
+"Yes, as ValueError",
+"Only inside finally"
+],
+"a": 1,
+"e": "Python checks syntax before running anything, so a SyntaxError in your own file can't be caught by that file's <code>try</code>."
+},
+{
+"q": "What does this print?",
+"c": "d = {\"a\": 1}\ntry:\n    print(d[\"b\"])\nexcept KeyError:\n    print(\"missing\")",
+"o": [
+"None",
+"missing",
+"0",
+"KeyError crash"
+],
+"a": 1,
+"e": "<code>d[\"b\"]</code> raises <code>KeyError</code>, which is caught. (<code>d.get(\"b\")</code> would give None without an error.)"
+},
+{
+"q": "What does this print?",
+"c": "L = [1, 2, 3]\ntry:\n    print(L[3])\nexcept IndexError:\n    print(\"out of range\")",
+"o": [
+"3",
+"out of range",
+"None",
+"[1, 2, 3]"
+],
+"a": 1,
+"e": "Valid positions are 0, 1, 2. Position 3 doesn't exist → <code>IndexError</code>."
+},
+{
+"q": "What does <code>raise ValueError(\"age must be positive\")</code> do?",
+"o": [
+"Prints the message and continues",
+"Creates and throws a ValueError that can be caught by except",
+"Ignores the next error",
+"Fixes the value automatically"
+],
+"a": 1,
+"e": "<code>raise</code> throws an error on purpose. If nothing catches it, the program stops with that message."
+},
+{
+"q": "What does this print?",
+"c": "def f():\n    try:\n        return 1\n    finally:\n        print(\"bye\")\n\nprint(f())",
+"o": [
+"1",
+"bye",
+"bye then 1",
+"1 then bye"
+],
+"a": 2,
+"e": "Even with <code>return</code> in try, <code>finally</code> runs before the function actually leaves. Then <code>print(f())</code> prints 1."
+},
+{
+"q": "What does this print?",
+"c": "total = 0\nfor s in [\"4\", \"x\", \"6\"]:\n    try:\n        total += int(s)\n    except ValueError:\n        pass\nprint(total)",
+"o": [
+"0",
+"10",
+"4",
+"Error"
+],
+"a": 1,
+"e": "\"x\" fails and <code>pass</code> skips it; the loop continues with \"6\". 4 + 6 = 10."
+},
+{
+"q": "Why is a bare <code>except:</code> (no error name) considered bad practice?",
+"o": [
+"It is a SyntaxError",
+"It catches every error, hiding bugs like typos",
+"It never runs",
+"It makes the program slower"
+],
+"a": 1,
+"e": "It catches everything, including <code>NameError</code> from your own typos, so real bugs become silent."
+},
+{
+"q": "How do you make your own exception type?",
+"o": [
+"def MyError(): pass",
+"class MyError(Exception): pass",
+"exception MyError:",
+"raise class MyError"
+],
+"a": 1,
+"e": "A custom exception is a class that inherits from <code>Exception</code>. Then use <code>raise MyError(\"message\")</code>."
+},
+{
+"q": "What does this print?",
+"c": "try:\n    print(totl)\nexcept ZeroDivisionError:\n    print(\"zero\")\nprint(\"end\")",
+"o": [
+"zero end",
+"end",
+"NameError crash; nothing after runs",
+"totl end"
+],
+"a": 2,
+"e": "<code>totl</code> doesn't exist → <code>NameError</code>. The only <code>except</code> is for ZeroDivisionError, so nothing matches and the program crashes."
+}
+];
+let answered = 0, correct = 0;
+function renderQuiz(){
+  answered = 0; correct = 0; updateScore();
+  const box = document.getElementById('qs'); box.innerHTML = '';
+  QUIZ.forEach((item, i) => {
+    const d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = `<div class="qn">Question ${i+1} of ${QUIZ.length}</div><div>${item.q}</div>` +
+      (item.c ? `<pre>${item.c.replace(/</g,'&lt;')}</pre>` : '') + `<div class="opts"></div>`;
+    const opts = d.querySelector('.opts');
+    item.o.forEach((text, j) => {
+      const b = document.createElement('button'); b.innerHTML = text;
+      b.addEventListener('click', () => {
+        opts.querySelectorAll('button').forEach((x, k) => { x.disabled = true; if (k === item.a) x.classList.add('right'); });
+        if (j !== item.a) b.classList.add('wrong'); else correct++;
+        answered++; updateScore();
+        const ex = document.createElement('div'); ex.className = 'explain';
+        ex.innerHTML = (j === item.a ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + item.e;
+        d.appendChild(ex);
+      });
+      opts.appendChild(b);
+    });
+    box.appendChild(d);
+  });
+}
+function updateScore(){
+  document.getElementById('score').textContent = `${correct} / ${answered}`;
+  document.getElementById('bar').style.width = (answered / QUIZ.length * 100) + '%';
+}
+document.getElementById('restart').addEventListener('click', renderQuiz);
+renderQuiz();
+
+/* ---------- exam ---------- */
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const EXAM = [
+{
+"t": "Define and explain",
+"m": 4,
+"q": "(a) What is an <strong>exception</strong>? (b) State the purpose of the <code>try</code>, <code>except</code>, <code>else</code> and <code>finally</code> blocks.",
+"a": "<p>(a) An exception is an error that occurs <strong>while the program is running</strong> (e.g. dividing by zero, converting \"abc\" to int). If it isn't handled, the program stops with a traceback.</p><ul><li><code>try</code>: holds the code that might cause an error.</li><li><code>except</code>: runs only if a matching error happens; handles it.</li><li><code>else</code>: runs only if <code>try</code> finished with no error.</li><li><code>finally</code>: always runs, used for clean-up such as closing files.</li></ul>"
+},
+{
+"t": "Name the exception",
+"m": 5,
+"q": "Name the exception raised by each statement.",
+"c": "(a) print(5 / 0)\n(b) num = int(\"twenty\")\n(c) print(\"Total: \" + 50)\n(d) fruits = [\"apple\", \"kiwi\"]; print(fruits[2])\n(e) open(\"no_such_file.txt\")",
+"a": "<p>(a) <code>ZeroDivisionError</code><br>(b) <code>ValueError</code><br>(c) <code>TypeError</code><br>(d) <code>IndexError</code><br>(e) <code>FileNotFoundError</code></p>"
+},
+{
+"t": "Predict the output: flow",
+"m": 4,
+"q": "State the output when <code>value</code> is (a) <code>\"8\"</code> and (b) <code>\"0\"</code>.",
+"c": "try:\n    n = int(value)\n    print(\"Result:\", 40 / n)\nexcept ValueError:\n    print(\"Not a number\")\nexcept ZeroDivisionError:\n    print(\"Cannot be zero\")\nelse:\n    print(\"Well done\")\nfinally:\n    print(\"End\")",
+"a": "<p>(a)</p><pre>Result: 5.0\nWell done\nEnd</pre><p>(b)</p><pre>Cannot be zero\nEnd</pre><p>In (b), <code>40 / 0</code> raises ZeroDivisionError, so <code>else</code> is skipped but <code>finally</code> still runs.</p>"
+},
+{
+"t": "Syntax error vs exception",
+"m": 3,
+"q": "Explain the difference between a syntax error and an exception. Give one example of each.",
+"a": "<ul><li>A <strong>syntax error</strong> breaks Python's grammar rules. It is found <strong>before</strong> the program runs and cannot be caught with try/except. Example: <code>if x &gt; 5</code> (missing colon).</li><li>An <strong>exception</strong> happens <strong>during</strong> execution even though the code is written correctly. It can be caught. Example: <code>10 / 0</code> → ZeroDivisionError.</li></ul>"
+},
+{
+"t": "Write a program: safe division",
+"m": 5,
+"q": "Write a program that asks the user for two numbers and prints the first divided by the second. Display a suitable message if the user enters something that is not a number, or enters 0 as the second number. The program must not crash.",
+"a": "<pre>try:\n    a = float(input(\"Enter first number: \"))\n    b = float(input(\"Enter second number: \"))\n    result = a / b\nexcept ValueError:\n    print(\"Please enter numbers only.\")\nexcept ZeroDivisionError:\n    print(\"The second number cannot be 0.\")\nelse:\n    print(\"Result:\", result)</pre><p>Marks: try block (1), ValueError handled (1), ZeroDivisionError handled (1), correct division and output (1), program does not crash (1).</p>"
+},
+{
+"t": "Write a program: input loop",
+"m": 5,
+"q": "Write a program that keeps asking the user for their age until a valid whole number between 1 and 120 is entered, then prints <code>Your age is ...</code>. Use <code>raise</code> for numbers outside the range.",
+"a": "<pre>while True:\n    try:\n        age = int(input(\"Enter your age: \"))\n        if age &lt; 1 or age &gt; 120:\n            raise ValueError(\"Age must be 1 to 120.\")\n    except ValueError as e:\n        print(\"Invalid:\", e)\n    else:\n        break\n\nprint(\"Your age is\", age)</pre><p>The loop only ends (<code>break</code>) in <code>else</code>, which runs when no error happened.</p>"
+},
+{
+"t": "Find and fix the errors",
+"m": 6,
+"q": "The program below has three problems. Identify each and write the corrected code.",
+"c": "try\n    marks = int(input(\"Marks: \"))\nexcept Exception:\n    print(\"Something went wrong\")\nexcept ValueError, TypeError:\n    print(\"Enter a whole number\")",
+"a": "<ul><li>Line 1: missing colon → <code>try:</code> (SyntaxError).</li><li>Two error types must be in brackets → <code>except (ValueError, TypeError):</code></li><li><code>except Exception</code> is first, so the specific block can never run → move it to the end.</li></ul><pre>try:\n    marks = int(input(\"Marks: \"))\nexcept (ValueError, TypeError):\n    print(\"Enter a whole number\")\nexcept Exception:\n    print(\"Something went wrong\")</pre>"
+},
+{
+"t": "Predict the output: loop with errors",
+"m": 4,
+"q": "State the output.",
+"c": "data = [\"10\", \"abc\", \"0\", \"5\"]\nfor d in data:\n    try:\n        print(100 // int(d))\n    except ValueError:\n        print(\"skip\")\n    except ZeroDivisionError:\n        print(\"zero\")",
+"a": "<pre>10\nskip\nzero\n20</pre><p>The loop keeps running because each error is caught inside the loop.</p>"
+},
+{
+"t": "Files and finally",
+"m": 4,
+"q": "Explain why <code>finally</code> is often used when working with files. Then write code that opens <code>scores.txt</code>, prints its contents and displays <code>File not found</code> if the file does not exist.",
+"a": "<p>A file that has been opened should always be closed, even if an error happens while reading it. <code>finally</code> runs whether or not an error occurred, so it guarantees the clean-up.</p><pre>try:\n    f = open(\"scores.txt\", \"r\")\nexcept FileNotFoundError:\n    print(\"File not found\")\nelse:\n    try:\n        print(f.read())\n    finally:\n        f.close()</pre><p>Also accepted: <code>with open(\"scores.txt\") as f:</code> inside a try, because <code>with</code> closes the file automatically.</p>"
+},
+{
+"t": "Custom exception",
+"m": 5,
+"q": "Create an exception class <code>InsufficientFundsError</code>. Write a function <code>withdraw(balance, amount)</code> that raises it when <code>amount</code> is more than <code>balance</code>, otherwise returns the new balance. Show how to call it safely.",
+"a": "<pre>class InsufficientFundsError(Exception):\n    pass\n\ndef withdraw(balance, amount):\n    if amount &gt; balance:\n        raise InsufficientFundsError(\"Not enough money\")\n    return balance - amount\n\ntry:\n    balance = withdraw(100, 150)\n    print(\"New balance:\", balance)\nexcept InsufficientFundsError as e:\n    print(\"Declined:\", e)</pre><p>Output: <code>Declined: Not enough money</code></p>"
+}
+];
+document.getElementById('exams').innerHTML = EXAM.map((x, i) =>
+  `<div class="ex"><h3>Question ${i+1}: ${x.t} <span class="marks">[${x.m} marks]</span></h3>
+   <p>${x.q}</p>${x.c ? `<pre>${esc(x.c)}</pre>` : ''}
+   <details><summary>Show model answer</summary><div class="ans">${x.a}</div></details></div>`).join('');
+</script>
+</body>
+</html>
